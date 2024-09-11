@@ -1,6 +1,6 @@
 
 # WeChat Backend
-[![My Skills](https://skillicons.dev/icons?i=go,mongodb,webrtc,figma&theme=light)](https://skillicons.dev)
+[![My Skills](https://skillicons.dev/icons?i=go,mongodb,webrtc&theme=light)](https://skillicons.dev)
 [![forthebadge](https://forthebadge.com/images/featured/featured-built-with-love.svg)](https://forthebadge.com)
 
 <img src="./assets/images/full-logo.png" alt="WeChat logo" width="200"/>
