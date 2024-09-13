@@ -1,9 +1,9 @@
 
 # WeChat Backend
-[![My Skills](https://skillicons.dev/icons?i=go,mongodb,webrtc,figma&theme=light)](https://skillicons.dev)
+[![My Skills](https://skillicons.dev/icons?i=go,mongodb,webrtc&theme=light)](https://skillicons.dev)
 [![forthebadge](https://forthebadge.com/images/featured/featured-built-with-love.svg)](https://forthebadge.com)
 
-<img src="./assets/images/full-logo.png" alt="WeChat logo" width="200"/>
+<img src="./assets/images/full-logo.png" alt="WeChat logo" width="500"/>
 
 WeChat is a mobile app that allows users to communicate in real-time. It offers messaging, calls, and video calls.  
 **WeChat es una aplicación móvil que permite a los usuarios comunicarse en tiempo real. Ofrece mensajería, llamadas y videollamadas.**
@@ -94,7 +94,7 @@ Modify server parameters using .env file
 2. Create .env_db file on the root directory
    **Crea archivo .env_db en la raiz del directorio**
    ```bash
-   touch .env
+   touch .env_db
 
 - **DB_URI** : string that allows connection with database / cadena que permite conexión con la base de datos **REQUIRED/REQUERIDO**
 - **DB_DATABASE** : Name of the database that you will be using / Nombre de la base de datos que estarás utilizando **REQUIRED/REQUERIDO**
