@@ -1,2 +1,7 @@
+# FILES
 .env*
 *.env
+
+# DIRECTORIES
+/noupload
+/dist
