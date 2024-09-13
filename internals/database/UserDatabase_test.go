@@ -104,7 +104,7 @@ func TestUpdateUserAccountDB(t *testing.T) {
 		}
 
 		dbRes := []bson.E{
-			{Key: "n", Value: 0},
+			{Key: "n", Value: 1},
 			{Key: "nModified", Value: 1},
 		}
 
@@ -148,13 +148,12 @@ func TestUpdateUserAccountDB(t *testing.T) {
 			{Key: "nModified", Value: 0},
 		}
 
-		phone := "9999999999"
 		update := map[string]interface{}{
 			"first_name": "John",
 		}
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse(dbRes...))
-		err := db.UpdateUserAccountDB(update, phone)
+		err := db.UpdateUserAccountDB(update, ObjectIDMockHex)
 		assert.EqualError(t, err, ErrNoModified.Error())
 	})
 
