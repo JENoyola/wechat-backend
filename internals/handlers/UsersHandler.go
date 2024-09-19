@@ -16,7 +16,7 @@ import (
 NewUserAccountEP
 creates a new user account and inserts it on the database
 */
-func NewUserAccountEP(w http.ResponseWriter, r *http.Request, db *database.DB) {
+func NewUserAccountEP(w http.ResponseWriter, r *http.Request, db database.DBHUB) {
 
 	log := logger.StartLogger()
 
@@ -64,7 +64,7 @@ func NewUserAccountEP(w http.ResponseWriter, r *http.Request, db *database.DB) {
 RequestNewCode
 request a new code to the user to login
 */
-func RequestNewCodeEP(w http.ResponseWriter, r *http.Request, db *database.DB) {
+func RequestNewCodeEP(w http.ResponseWriter, r *http.Request, db database.DBHUB) {
 
 	log := logger.StartLogger()
 
@@ -116,7 +116,7 @@ func RequestNewCodeEP(w http.ResponseWriter, r *http.Request, db *database.DB) {
 UserCodeVerificationEP
 Verifies the user account and signs the user
 */
-func UserCodeVerificationEP(w http.ResponseWriter, r *http.Request, db *database.DB) {
+func UserCodeVerificationEP(w http.ResponseWriter, r *http.Request, db database.DBHUB) {
 
 	log := logger.StartLogger()
 
@@ -192,7 +192,7 @@ func UserCodeVerificationEP(w http.ResponseWriter, r *http.Request, db *database
 LoginEP
 logs the user and sends a verification code to the user email
 */
-func LoginEP(w http.ResponseWriter, r *http.Request, db *database.DB) {
+func LoginEP(w http.ResponseWriter, r *http.Request, db database.DBHUB) {
 
 	log := logger.StartLogger()
 
@@ -241,7 +241,7 @@ func LoginEP(w http.ResponseWriter, r *http.Request, db *database.DB) {
 SearchUsersEP
 gets a list of users that match the desired query
 */
-func SearchUsersEP(w http.ResponseWriter, r *http.Request, db *database.DB) {
+func SearchUsersEP(w http.ResponseWriter, r *http.Request, db database.DBHUB) {
 
 	log := logger.StartLogger()
 

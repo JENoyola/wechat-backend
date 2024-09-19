@@ -5,10 +5,10 @@ import (
 	"wechat-back/internals/database"
 )
 
-type HandlerFuncWithDeps func(w http.ResponseWriter, r *http.Request, db *database.DB)
+type HandlerFuncWithDeps func(w http.ResponseWriter, r *http.Request, db database.DBHUB)
 
 // HandlerDecorator creats a middle man between handlers in order to inject database dependecies
-func HandlerDecorator(handler HandlerFuncWithDeps, db *database.DB) http.HandlerFunc {
+func HandlerDecorator(handler HandlerFuncWithDeps, db database.DBHUB) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 

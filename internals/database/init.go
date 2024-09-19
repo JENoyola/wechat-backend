@@ -5,10 +5,18 @@ import (
 	"errors"
 	"log"
 	"os"
+	"wechat-back/internals/models"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+type DBHUB interface {
+	FindUserDB(string) (models.User, bool, error)
+	InsertUserDB(models.User) (string, error)
+	UpdateUserAccountDB(map[string]any, string) error
+	GetUsers(int, string) ([]*models.User, error)
+}
 
 // ERRORS
 var (
