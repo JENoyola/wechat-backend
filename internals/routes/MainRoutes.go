@@ -17,7 +17,11 @@ func ServerRoutes() http.Handler {
 	mux.Use(middleware.RequestID)
 	mux.Use(middleware.Timeout(90 * time.Second))
 
+	// Health routes
 	HealtRoutes(mux)
+
+	// user routes
+	UserRoutes(mux)
 
 	return mux
 }

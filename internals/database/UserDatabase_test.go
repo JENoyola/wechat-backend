@@ -16,8 +16,8 @@ func TestFindUserDB(t *testing.T) {
 
 	mt.Run("FindUser - Success", func(mt *mtest.T) {
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		email := "jorge@mail.com"
@@ -26,21 +26,21 @@ func TestFindUserDB(t *testing.T) {
 			{Key: "email", Value: user.Email},
 		}))
 
-		res, err := db.FindUserDB(email)
+		res, _, err := db.FindUserDB(email)
 		assert.NoError(t, err)
 		assert.Equal(t, email, res.Email)
 	})
 
 	mt.Run("FindUser - Not Found", func(mt *mtest.T) {
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		phone := "jorge@mail.com"
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "test_db.users", mtest.FirstBatch))
 
-		_, err := db.FindUserDB(phone)
+		_, _, err := db.FindUserDB(phone)
 		assert.Error(t, err)
 	})
 }
@@ -52,8 +52,8 @@ func TestInsertUserDB(t *testing.T) {
 
 	mongoTest.Run("InsertUser - Success", func(mt *mtest.T) {
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		user := models.User{
@@ -73,8 +73,8 @@ func TestInsertUserDB(t *testing.T) {
 	mongoTest.Run("InsertUser - Error", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		user := models.User{
@@ -99,8 +99,8 @@ func TestUpdateUserAccountDB(t *testing.T) {
 
 	mt.Run("UpdateUser - Success", func(mt *mtest.T) {
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		dbRes := []bson.E{
@@ -119,8 +119,8 @@ func TestUpdateUserAccountDB(t *testing.T) {
 
 	mt.Run("UpdateUser - No Match", func(mt *mtest.T) {
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		dbRes := []bson.E{
@@ -139,8 +139,8 @@ func TestUpdateUserAccountDB(t *testing.T) {
 
 	mt.Run("UpdateUser - No Match", func(mt *mtest.T) {
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		dbRes := []bson.E{
@@ -167,8 +167,8 @@ func TestGetUsers(t *testing.T) {
 	mt.Run("GetUsers - Success", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		pg := 1
@@ -200,8 +200,8 @@ func TestGetUsers(t *testing.T) {
 	mt.Run("GetUsers - No users", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		pg := 1
@@ -217,8 +217,8 @@ func TestGetUsers(t *testing.T) {
 	mt.Run("GetUsers - encounter error", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		pg := 1

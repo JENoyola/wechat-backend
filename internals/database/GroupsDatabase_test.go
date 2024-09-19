@@ -18,8 +18,8 @@ func TestGetGroupDB(t *testing.T) {
 	mt.Run("GetGroupDB - Success", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		i := ObjectIDMockHex
@@ -42,8 +42,8 @@ func TestGetGroupDB(t *testing.T) {
 	mt.Run("GetGroupDB  - Invalid object ID", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		i := "NOT A OBJECT ID"
@@ -59,8 +59,8 @@ func TestGetGroupDB(t *testing.T) {
 	mt.Run("GetGroupDB  - No documents", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		i := ObjectIDMockHex
@@ -85,8 +85,8 @@ func TestInsertGroupDB(t *testing.T) {
 	mt.Run("InsertGroupDB - Succes", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		group := models.Group{
@@ -104,8 +104,8 @@ func TestInsertGroupDB(t *testing.T) {
 	mt.Run("InsertGroupDB - Error", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		group := models.Group{
@@ -132,8 +132,8 @@ func TestUpdateGroupDB(t *testing.T) {
 	mt.Run("TestUpdateGroupDB - Succes", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		dbres := []bson.E{
@@ -155,8 +155,8 @@ func TestUpdateGroupDB(t *testing.T) {
 	mt.Run("TestUpdateGroupDB - Error no matched documents", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		dbres := []bson.E{
@@ -178,8 +178,8 @@ func TestUpdateGroupDB(t *testing.T) {
 	mt.Run("TestUpdateGroupDB - Error no modified", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		dbres := []bson.E{
@@ -207,8 +207,8 @@ func TestDeleteGroupDB(t *testing.T) {
 	mt.Run("DeleteGroupDB - Success", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		dbRes := bson.E{
@@ -226,8 +226,8 @@ func TestDeleteGroupDB(t *testing.T) {
 	mt.Run("DeleteGroupDB - Error primitive", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		dbRes := bson.E{
@@ -245,8 +245,8 @@ func TestDeleteGroupDB(t *testing.T) {
 	mt.Run("DeleteGroupDB - Error no deleted", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		dbRes := bson.E{
@@ -269,8 +269,8 @@ func TestSearchGroups(t *testing.T) {
 
 	mt.Run("SearchGroups - Success with Results", func(mt *mtest.T) {
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		page := 1
@@ -297,8 +297,8 @@ func TestSearchGroups(t *testing.T) {
 	mt.Run("SearchGroups - No groups", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		pg := 1
@@ -314,8 +314,8 @@ func TestSearchGroups(t *testing.T) {
 	mt.Run("SearchGroups - encounter error", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		pg := 1

@@ -19,8 +19,8 @@ func TestGetPrivateChatLogsDB(t *testing.T) {
 	mt.Run("GetPrivateChatLogsDB - Success", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		pg := 1
@@ -47,8 +47,8 @@ func TestGetPrivateChatLogsDB(t *testing.T) {
 	mt.Run("GetPrivateChatLogsDB - primitive error", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		pg := 1
@@ -75,8 +75,8 @@ func TestGetPrivateChatLogsDB(t *testing.T) {
 	mt.Run("GetPrivateChatLogsDB - No documents", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		pg := 1
@@ -103,8 +103,8 @@ func TestGetGroupChatLogsDB(t *testing.T) {
 	mt.Run("GetGroupChatLogsDB - Success", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		pg := 1
@@ -131,8 +131,8 @@ func TestGetGroupChatLogsDB(t *testing.T) {
 	mt.Run("GetGroupChatLogsDB - primitive error", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		pg := 1
@@ -159,8 +159,8 @@ func TestGetGroupChatLogsDB(t *testing.T) {
 	mt.Run("GetGroupChatLogsDB - No documents", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		pg := 1
@@ -186,8 +186,8 @@ func TestInsertP2PMessageDB(t *testing.T) {
 	mt.Run("InsertP2PMessageDB - Success", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		m := models.P2PChatLog{
@@ -205,8 +205,8 @@ func TestInsertP2PMessageDB(t *testing.T) {
 	mt.Run("InsertP2PMessageDB - Error", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		m := models.P2PChatLog{
@@ -234,8 +234,8 @@ func TestInsertGroupMessageDB(t *testing.T) {
 	mt.Run("InsertGroupMessageDB - Success", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		m := models.GroupChatLog{
@@ -253,8 +253,8 @@ func TestInsertGroupMessageDB(t *testing.T) {
 	mt.Run("InsertGroupMessageDB - Error", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		m := models.GroupChatLog{
@@ -282,8 +282,8 @@ func TestUpdateP2PMessageDB(t *testing.T) {
 	mt.Run("UpdateP2PMessage - Success", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		res := []bson.E{
@@ -307,8 +307,8 @@ func TestUpdateP2PMessageDB(t *testing.T) {
 	mt.Run("UpdateP2PMessage - BSON error", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		update := make(map[string]any)
@@ -322,8 +322,8 @@ func TestUpdateP2PMessageDB(t *testing.T) {
 	mt.Run("UpdateP2PMessage - No documents", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		res := []bson.E{
@@ -341,8 +341,8 @@ func TestUpdateP2PMessageDB(t *testing.T) {
 	mt.Run("UpdateP2PMessage - Error no modified", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		res := []bson.E{
@@ -367,8 +367,8 @@ func TestUpdateGroupMessageDB(t *testing.T) {
 	mt.Run("UpdateGroupMessageDB - Success", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		res := []bson.E{
@@ -392,8 +392,8 @@ func TestUpdateGroupMessageDB(t *testing.T) {
 	mt.Run("UpdateGroupMessageDB - BSON error", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		update := make(map[string]any)
@@ -407,8 +407,8 @@ func TestUpdateGroupMessageDB(t *testing.T) {
 	mt.Run("UpdateGroupMessageDB - No documents", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		res := []bson.E{
@@ -426,8 +426,8 @@ func TestUpdateGroupMessageDB(t *testing.T) {
 	mt.Run("UpdateGroupMessageDB - Error no modified", func(mt *mtest.T) {
 
 		db := &DB{
-			client:   mt.Client,
-			Database: mockDBName,
+			Client:   mt.Client,
+			Database: MockDBName,
 		}
 
 		res := []bson.E{

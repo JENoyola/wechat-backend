@@ -2,7 +2,17 @@ package tools
 
 import "wechat-back/internals/models"
 
-func FormatResponse(code int, err error) models.ServerResponse {
+func FormatSuccessResponse(data any, code int, message string) models.ServerResponse {
+	var res models.ServerResponse
+	res.Code = code
+	res.DATA = data
+	res.Error = false
+	res.Message = message
+
+	return res
+}
+
+func FormatErrResponse(code int, err error) models.ServerResponse {
 	var res models.ServerResponse
 
 	res.Code = code
@@ -12,7 +22,7 @@ func FormatResponse(code int, err error) models.ServerResponse {
 	return res
 }
 
-func FormatCustomResponse(message string, code int) models.ServerResponse {
+func FormatCustomErrResponse(message string, code int) models.ServerResponse {
 	var res models.ServerResponse
 
 	res.Code = code

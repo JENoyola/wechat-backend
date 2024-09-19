@@ -15,7 +15,7 @@ import (
 FindUserDB
 finds if a user has already an account
 */
-func (db *DB) FindUserDB(email string) (models.User, error) {
+func (db *DB) FindUserDB(email string) (models.User, bool, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
@@ -28,10 +28,13 @@ func (db *DB) FindUserDB(email string) (models.User, error) {
 
 	err := db.FormatUserCollection().FindOne(ctx, filter, nil).Decode(&res)
 	if err != nil {
-		return res, err
+		if err == mongo.ErrNoDocuments {
+			return res, false, nil
+		}
+		return res, true, err
 	}
 
-	return res, nil
+	return res, true, nil
 }
 
 /*
