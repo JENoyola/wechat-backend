@@ -106,9 +106,13 @@ Modify server parameters using .env file
 ---
 
 ## API Endpoints / Puntos de acceso a servidor
-- **/l - POST** : Connection for login with account / conexion para iniciar sesión con cuenta **Check out required body filds and/or headers on enpoint handlers respectively / Revisa los campos body y/o encabezados requeridos en los puntos de accesso respectivos**
-- **/cv?e={email}&c={code} - PUT** : Connection that verifies the code sent to user to their email inbox / conexion que permite verificar el codigo de acceso enviado a su bandeja de entrade de su correo electonico **Check out required body filds and/or headers on enpoint handlers respectively / Revisa los campos body y/o encabezados requeridos en los puntos de accesso respectivos**
+
+- **/l - POST** : Connection for login with account / Conneccion para iniciar sesión con cuenta **Check out required body filds and/or headers on enpoint handlers respectively / Revisa los campos body y/o encabezados requeridos en los puntos de accesso respectivos**
 - **/nsg - POST** : Connection that allow user to create a new account / Conexion que permite nuevo usuario crear una cuenta nueva **Check out required body filds and/or headers on enpoint handlers respectively / Revisa los campos body y/o encabezados requeridos en los puntos de accesso respectivos**
+- **/cv - PUT** : Connection that allows the user to receive access code via email / Conexion que permite al usuario recibir un codigo de acceso via correo electronico.
+- **/sn?e={email} - GET** : Connection that allows the user to request another access code / Conexicon que permite al usuario pedir otro codigo de acceso. **Check out required body filds and/or headers on enpoint handlers respectively / Revisa los campos body y/o encabezados requeridos en los puntos de accesso respectivos**
+- **/ulkup?pg={page number default: 1}&q={user_name} - GET** : Connection that allows the user to search other users based on user name or do a general search / Conexion que permite al usuario hacer una busqueda de usuarios por nombre o busqueda general **Check out required body filds and/or headers on enpoint handlers respectively / Revisa los campos body y/o encabezados requeridos en los puntos de accesso respectivos**
+--
 - **/chats - GET** : Connection that gets all the current chats and/or groups the user has initiated / Conexion que trae todos los chats y/o grupos el usuario ha iniciado **Check out required body filds and/or headers on enpoint handlers respectively / Revisa los campos body y/o encabezados requeridos en los puntos de accesso respectivos**
 - **/nch?chtid={chat_id} - GET** : Connection that allows user to send messages weather is a private conversation or a group
 - **/lkup?qry={search_query} - GET** Connection that allows user to search for other users or groups / Conexión que permite buscar a otros usuarios o grupos 

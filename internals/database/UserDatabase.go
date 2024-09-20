@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"time"
 	"wechat-back/internals/models"
 
@@ -15,7 +16,7 @@ import (
 FindUserDB
 finds if a user has already an account
 */
-func (db *DB) FindUserDB(email string) (models.User, error) {
+func (db *DB) FindUserDB(email string) (models.User, bool, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
@@ -28,10 +29,13 @@ func (db *DB) FindUserDB(email string) (models.User, error) {
 
 	err := db.FormatUserCollection().FindOne(ctx, filter, nil).Decode(&res)
 	if err != nil {
-		return res, err
+		if err == mongo.ErrNoDocuments {
+			return res, false, nil
+		}
+		return res, true, err
 	}
 
-	return res, nil
+	return res, true, nil
 }
 
 /*
@@ -63,6 +67,8 @@ func (db *DB) UpdateUserAccountDB(update map[string]any, i string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
+	fmt.Println("---------> id: ", i)
+
 	id, err := primitive.ObjectIDFromHex(i)
 	if err != nil {
 		return err
@@ -80,6 +86,8 @@ func (db *DB) UpdateUserAccountDB(update map[string]any, i string) error {
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("---------> herre: ", res)
 
 	if res.MatchedCount < 1 {
 		return mongo.ErrNoDocuments
