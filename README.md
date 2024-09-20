@@ -1,9 +1,9 @@
 
 # WeChat Backend
-[![My Skills](https://skillicons.dev/icons?i=go,mongodb,webrtc,figma&theme=light)](https://skillicons.dev)
+[![My Skills](https://skillicons.dev/icons?i=go,mongodb,webrtc&theme=light)](https://skillicons.dev)
 [![forthebadge](https://forthebadge.com/images/featured/featured-built-with-love.svg)](https://forthebadge.com)
 
-<img src="./assets/images/full-logo.png" alt="WeChat logo" width="200"/>
+<img src="./assets/images/full-logo.png" alt="WeChat logo" width="500"/>
 
 WeChat is a mobile app that allows users to communicate in real-time. It offers messaging, calls, and video calls.  
 **WeChat es una aplicación móvil que permite a los usuarios comunicarse en tiempo real. Ofrece mensajería, llamadas y videollamadas.**
@@ -94,7 +94,7 @@ Modify server parameters using .env file
 2. Create .env_db file on the root directory
    **Crea archivo .env_db en la raiz del directorio**
    ```bash
-   touch .env
+   touch .env_db
 
 - **DB_URI** : string that allows connection with database / cadena que permite conexión con la base de datos **REQUIRED/REQUERIDO**
 - **DB_DATABASE** : Name of the database that you will be using / Nombre de la base de datos que estarás utilizando **REQUIRED/REQUERIDO**
@@ -106,6 +106,7 @@ Modify server parameters using .env file
 ---
 
 ## API Endpoints / Puntos de acceso a servidor
+
 - **/l - POST** : Connection for login with account / Conneccion para iniciar sesión con cuenta **Check out required body filds and/or headers on enpoint handlers respectively / Revisa los campos body y/o encabezados requeridos en los puntos de accesso respectivos**
 - **/nsg - POST** : Connection that allow user to create a new account / Conexion que permite nuevo usuario crear una cuenta nueva **Check out required body filds and/or headers on enpoint handlers respectively / Revisa los campos body y/o encabezados requeridos en los puntos de accesso respectivos**
 - **/cv - PUT** : Connection that allows the user to receive access code via email / Conexion que permite al usuario recibir un codigo de acceso via correo electronico.
