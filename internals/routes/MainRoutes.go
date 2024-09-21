@@ -23,6 +23,9 @@ func ServerRoutes() http.Handler {
 	// user routes
 	UserRoutes(mux)
 
+	// group routes
+	GroupHandlers(mux)
+
 	return mux
 }
 

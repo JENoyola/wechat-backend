@@ -7,15 +7,24 @@ import (
 	"os"
 	"wechat-back/internals/models"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type DBHUB interface {
+	// users
 	FindUserDB(string) (models.User, bool, error)
 	InsertUserDB(models.User) (string, error)
 	UpdateUserAccountDB(map[string]any, string) error
 	GetUsers(int, string) ([]*models.User, error)
+
+	// groups
+	GetGroupDB(string) (*models.Group, error)
+	InsertGroupDB(models.Group) (string, error)
+	UpdateGroupDB(map[string]any, primitive.ObjectID) error
+	DeleteGroupDB(string) error
+	SearchGroups(int, string) ([]*models.Group, error)
 }
 
 // ERRORS

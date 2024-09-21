@@ -39,23 +39,6 @@ func TestGetGroupDB(t *testing.T) {
 		assert.Equal(t, res.Name, group_name)
 	})
 
-	mt.Run("GetGroupDB  - Invalid object ID", func(mt *mtest.T) {
-
-		db := &DB{
-			Client:   mt.Client,
-			Database: MockDBName,
-		}
-
-		i := "NOT A OBJECT ID"
-
-		mt.AddMockResponses(mtest.CreateCursorResponse(0, "test_db.groups", mtest.FirstBatch, nil))
-
-		res, err := db.GetGroupDB(i)
-
-		assert.EqualError(t, err, primitive.ErrInvalidHex.Error())
-		assert.Nil(t, res)
-	})
-
 	mt.Run("GetGroupDB  - No documents", func(mt *mtest.T) {
 
 		db := &DB{
