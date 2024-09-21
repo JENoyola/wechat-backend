@@ -13,4 +13,8 @@ jobs:
 
     steps:
     - name: Run tests
+
       run: make test
+
+      run: make test
+

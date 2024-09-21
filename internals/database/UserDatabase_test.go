@@ -38,7 +38,10 @@ func TestFindUserDB(t *testing.T) {
 		}
 
 		phone := "jorge@mail.com"
-		mt.AddMockResponses(mtest.CreateCursorResponse(0, "test_db.users", mtest.FirstBatch))
+		mt.AddMockResponses(mtest.CreateCommandErrorResponse(mtest.CommandError{
+			Code:    1234,
+			Message: "user not found",
+		}))
 
 		_, _, err := db.FindUserDB(phone)
 		assert.Error(t, err)

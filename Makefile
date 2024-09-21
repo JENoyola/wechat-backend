@@ -6,6 +6,8 @@ test-handlers:
 	@ echo starting tests on handlers 
 	@ go test ./internals/handlers/... -cover -fullpath -benchmem 
 
+test: test-database test-handlers
+
 build:
 	@ echo building API
 	@ go build -o ./dist/app ./cmd/main.go 

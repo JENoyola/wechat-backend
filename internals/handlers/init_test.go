@@ -19,7 +19,16 @@ type DBMock struct {
 	InsertUserMockFunc func(models.User) (string, error)
 	UpdateUserMockFunc func(map[string]any, string) error
 	GetUsersMockFunc   func(int, string) ([]*models.User, error)
+
+	// groups
+	GetGroupDBMockFunc    func(string) (*models.Group, error)
+	InsertGroupDBMockFunc func(models.Group) (string, error)
+	UpdateGroupDBMockFunc func(map[string]any, primitive.ObjectID) error
+	DeleteGroupDBMockFunc func(string) error
+	SearchGroupsMockFunc  func(int, string) ([]*models.Group, error)
 }
+
+/*USER MOCK FUNCTIONS*/
 
 func (db *DBMock) FindUserDB(email string) (models.User, bool, error) {
 
@@ -46,4 +55,40 @@ func (db *DBMock) GetUsers(pg int, query string) ([]*models.User, error) {
 		return db.GetUsersMockFunc(pg, query)
 	}
 	return []*models.User{}, nil
+}
+
+/*GROUP MOCK FUNCTIONS*/
+func (db *DBMock) GetGroupDB(s string) (*models.Group, error) {
+	if db.GetGroupDBMockFunc != nil {
+		return db.GetGroupDBMockFunc(s)
+	}
+	return &models.Group{}, nil
+}
+
+func (db *DBMock) InsertGroupDB(g models.Group) (string, error) {
+	if db.InsertGroupDBMockFunc != nil {
+		return db.InsertGroupDBMockFunc(g)
+	}
+	return "", nil
+}
+
+func (db *DBMock) UpdateGroupDB(u map[string]any, i primitive.ObjectID) error {
+	if db.UpdateGroupDBMockFunc != nil {
+		return db.UpdateGroupDBMockFunc(u, i)
+	}
+	return nil
+}
+
+func (db *DBMock) DeleteGroupDB(i string) error {
+	if db.DeleteGroupDBMockFunc != nil {
+		return db.DeleteGroupDBMockFunc(i)
+	}
+	return nil
+}
+
+func (db *DBMock) SearchGroups(pg int, query string) ([]*models.Group, error) {
+	if db.SearchGroupsMockFunc != nil {
+		return db.SearchGroupsMockFunc(pg, query)
+	}
+	return []*models.Group{}, nil
 }

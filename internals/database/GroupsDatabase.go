@@ -20,22 +20,14 @@ func (db *DB) GetGroupDB(i string) (*models.Group, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	id, err := primitive.ObjectIDFromHex(i)
-	if err != nil {
-		return nil, err
-	}
-
 	filter := bson.M{
-		"_id": bson.M{"$eq": id},
+		"group_id": bson.M{"$eq": i},
 	}
 
 	var res models.Group
 
-	err = db.FormatGroupCollection().FindOne(ctx, filter, nil).Decode(&res)
+	err := db.FormatGroupCollection().FindOne(ctx, filter, nil).Decode(&res)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return nil, mongo.ErrNoDocuments
-		}
 		return nil, err
 	}
 

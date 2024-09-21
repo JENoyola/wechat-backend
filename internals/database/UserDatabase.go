@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"fmt"
 	"time"
 	"wechat-back/internals/models"
 
@@ -67,8 +66,6 @@ func (db *DB) UpdateUserAccountDB(update map[string]any, i string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	fmt.Println("---------> id: ", i)
-
 	id, err := primitive.ObjectIDFromHex(i)
 	if err != nil {
 		return err
@@ -86,8 +83,6 @@ func (db *DB) UpdateUserAccountDB(update map[string]any, i string) error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("---------> herre: ", res)
 
 	if res.MatchedCount < 1 {
 		return mongo.ErrNoDocuments
