@@ -8,9 +8,12 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"wechat-back/internals/logger"
 )
 
 func StartServer(cfg ServeConfig) error {
+
+	alog := logger.StartLogger()
 
 	srv := http.Server{
 		Addr:              fmt.Sprintf(":%v", cfg.PORT),
@@ -25,41 +28,44 @@ func StartServer(cfg ServeConfig) error {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGSYS)
 
+	StartWebsocketService()
+
 	if cfg.ENV == "PROD" || cfg.ENV == "DIST" {
 
 		go func() {
-			fmt.Printf("API v%v STARTING AT PORT %v on ENV %v\n", cfg.API_VERSION, cfg.PORT, cfg.ENV)
+			alog.InfoLogger(fmt.Sprintf("API v%v STARTING AT PORT %v on ENV %v\n", cfg.API_VERSION, cfg.PORT, cfg.ENV))
 			err := srv.ListenAndServeTLS(cfg.TLSC, cfg.TLSK)
 			if err != nil {
+				alog.ErrorLog(err.Error())
 				return
 			}
 		}()
 	} else {
 		go func() {
-			fmt.Printf("API v%v STARTING AT PORT %v on ENV %v\n", cfg.API_VERSION, cfg.PORT, cfg.ENV)
+			alog.InfoLogger(fmt.Sprintf("API v%v STARTING AT PORT %v on ENV %v\n", cfg.API_VERSION, cfg.PORT, cfg.ENV))
 			err := srv.ListenAndServe()
 			if err != nil {
+				alog.ErrorLog(err.Error())
 				return
 			}
 		}()
 	}
 
 	<-stop
-	// log.WarningLogger("Initializing Gracefully Server Stop Protocol")
+	alog.WarningLogger("Initializing Gracefully Server Stop Protocol")
+	StopWebsocketService()
 
-	/*if cfg.ENV == "PROD" || cfg.ENV == "DIST" {
-		// Send email to developer
-	}*/
+	// notify developers about server gracefully shutdown
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		// log.Fatal(err.Error())
+		alog.ErrorLog(err.Error())
 		return err
 	}
 
-	fmt.Println("server stopped gracefully")
+	alog.WarningLogger("server stopped gracefully")
 	return nil
 
 }
