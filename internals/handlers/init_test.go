@@ -26,6 +26,10 @@ type DBMock struct {
 	UpdateGroupDBMockFunc func(map[string]any, primitive.ObjectID) error
 	DeleteGroupDBMockFunc func(string) error
 	SearchGroupsMockFunc  func(int, string) ([]*models.Group, error)
+
+	// Chat
+	InsertP2PMessageDBMockFunc  func(models.P2PTextChatLog) (string, error)
+	InsertGroupMessageDBMockFun func(m models.GroupChatTextLog) (string, error)
 }
 
 /*USER MOCK FUNCTIONS*/
@@ -91,4 +95,20 @@ func (db *DBMock) SearchGroups(pg int, query string) ([]*models.Group, error) {
 		return db.SearchGroupsMockFunc(pg, query)
 	}
 	return []*models.Group{}, nil
+}
+
+// CHAT METHODS
+
+func (db *DBMock) InsertP2PMessageDB(m models.P2PTextChatLog) (string, error) {
+	if db.InsertP2PMessageDBMockFunc != nil {
+		return db.InsertP2PMessageDBMockFunc(m)
+	}
+	return "", nil
+}
+
+func (db *DBMock) InsertGroupMessageDB(m models.GroupChatTextLog) (string, error) {
+	if db.InsertGroupMessageDBMockFun != nil {
+		return db.InsertGroupMessageDBMockFun(m)
+	}
+	return "", nil
 }

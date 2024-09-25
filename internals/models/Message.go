@@ -36,7 +36,7 @@ const (
 GroupChatLog
 // Represent a message structure for groups
 */
-type GroupChatLog struct {
+type GroupChatTextLog struct {
 	ID         primitive.ObjectID `json:"_id" bson:"_id"`
 	TargetID   primitive.ObjectID `json:"target_id" bson:"target_id"`
 	AuthorID   primitive.ObjectID `json:"author_id" bson:"author_id"`
@@ -46,15 +46,25 @@ type GroupChatLog struct {
 	Body       string             `json:"body" bson:"body"`
 	Alt        string             `json:"alt" bson:"alt"`
 	Created_At time.Time          `json:"created_at" bson:"created_at"`
-	Updated_At time.Time          `json:"updated_at" bson:"updated_at"`
-	Edited     int                `json:"edited" bson:"edited"`
+}
+
+func (g *GroupChatTextLog) FormatTextChatLog(groupID, author_id primitive.ObjectID, authorname, body string) {
+	g.ID = primitive.NewObjectID()
+	g.TargetID = groupID
+	g.AuthorID = author_id
+	g.ContentID = "N/A"
+	g.AuthorName = authorname
+	g.BodyType = MESSAGE_STANDARD_TYPE
+	g.Body = body
+	g.Alt = ""
+	g.Created_At = time.Now()
 }
 
 /*
 P2PChatLog
 Represents a message structure for private conversations
 */
-type P2PChatLog struct {
+type P2PTextChatLog struct {
 	ID         primitive.ObjectID `json:"_id" bson:"_id"`
 	TargetID   primitive.ObjectID `json:"target_id" bson:"target_id"`
 	AuthorID   primitive.ObjectID `json:"author_id" bson:"author_id"`
@@ -62,7 +72,16 @@ type P2PChatLog struct {
 	AuthorName string             `json:"author_name" bson:"author_name"`
 	BodyType   int                `json:"body_type" bson:"body_type"`
 	Body       string             `json:"body" bson:"body"`
-	Alt        string             `json:"alt" bson:"alt"`
 	Created_at time.Time          `json:"created_at" bson:"created_at"`
-	Edited     int                `json:"edited" bson:"edited"`
+}
+
+func (p *P2PTextChatLog) FormatTextLog(targetID, author primitive.ObjectID, authorName, body string) {
+	p.ID = primitive.NewObjectID()
+	p.TargetID = targetID
+	p.AuthorID = author
+	p.ContentID = "N/A"
+	p.AuthorName = authorName
+	p.BodyType = MESSAGE_STANDARD_TYPE
+	p.Body = body
+	p.Created_at = time.Now()
 }

@@ -25,6 +25,10 @@ type DBHUB interface {
 	UpdateGroupDB(map[string]any, primitive.ObjectID) error
 	DeleteGroupDB(string) error
 	SearchGroups(int, string) ([]*models.Group, error)
+
+	// chats
+	InsertP2PMessageDB(models.P2PTextChatLog) (string, error)
+	InsertGroupMessageDB(models.GroupChatTextLog) (string, error)
 }
 
 // ERRORS

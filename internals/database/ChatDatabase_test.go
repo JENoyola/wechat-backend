@@ -190,7 +190,7 @@ func TestInsertP2PMessageDB(t *testing.T) {
 			Database: MockDBName,
 		}
 
-		m := models.P2PChatLog{
+		m := models.P2PTextChatLog{
 			Body: "Hola como estas",
 		}
 
@@ -209,7 +209,7 @@ func TestInsertP2PMessageDB(t *testing.T) {
 			Database: MockDBName,
 		}
 
-		m := models.P2PChatLog{
+		m := models.P2PTextChatLog{
 			Body: "Hola como estas",
 		}
 
@@ -238,7 +238,7 @@ func TestInsertGroupMessageDB(t *testing.T) {
 			Database: MockDBName,
 		}
 
-		m := models.GroupChatLog{
+		m := models.GroupChatTextLog{
 			Body: "Hola como estas",
 		}
 
@@ -257,7 +257,7 @@ func TestInsertGroupMessageDB(t *testing.T) {
 			Database: MockDBName,
 		}
 
-		m := models.GroupChatLog{
+		m := models.GroupChatTextLog{
 			Body: "Hola como estas",
 		}
 

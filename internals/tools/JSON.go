@@ -5,8 +5,8 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"github.com/gorilla/websocket"
 
-	"golang.org/x/net/websocket"
 )
 
 // ReadStringToJSON takes a string and embeds it to a given structure
@@ -73,4 +73,11 @@ func WriteJSON(w http.ResponseWriter, status int, data interface{}, headers ...h
 
 	return nil
 
+}
+
+// WriteWebsocketJSON write a websocket message to the client
+func WriteWebsocketJSON(conn *websocket.Conn, data any) {
+
+	conn.WriteJSON(data)
+	conn.Close()
 }

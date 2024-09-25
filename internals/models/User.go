@@ -21,7 +21,7 @@ type User struct {
 	ValidCode     int                `json:"valid_code" bson:"valid_code"`
 	TempCode      int                `json:"temp_code" bson:"temp_code"`
 	CodeTimestamp time.Time          `json:"code_timestamp" bson:"code_timestamp"`
-	Credentials   UserCredentials    `json:"credentials" bson:"crendentials"`
+	Credentials   UserCredentials    `json:"credentials" bson:"credentials"`
 	CreatedAt     time.Time          `json:"created_at" bson:"created_at"`
 }
 

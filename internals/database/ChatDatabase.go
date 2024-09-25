@@ -17,7 +17,7 @@ import (
 	Gets all the private message of a private converation
 */
 
-func (db *DB) GetPrivateChatLogsDB(pg int, tar, curr string) ([]*models.P2PChatLog, error) {
+func (db *DB) GetPrivateChatLogsDB(pg int, tar, curr string) ([]*models.P2PTextChatLog, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 	defer cancel()
@@ -43,7 +43,7 @@ func (db *DB) GetPrivateChatLogsDB(pg int, tar, curr string) ([]*models.P2PChatL
 	opts.SetSkip(int64((pg - 1) * 60))
 	opts.SetLimit(60)
 
-	var res []*models.P2PChatLog
+	var res []*models.P2PTextChatLog
 
 	cursor, err := db.FormatUserChatlogs().Find(ctx, filter, opts)
 	if err != nil {
@@ -53,7 +53,7 @@ func (db *DB) GetPrivateChatLogsDB(pg int, tar, curr string) ([]*models.P2PChatL
 
 	for cursor.Next(ctx) {
 
-		var chat models.P2PChatLog
+		var chat models.P2PTextChatLog
 
 		err := cursor.Decode(&chat)
 		if err != nil {
@@ -75,7 +75,7 @@ func (db *DB) GetPrivateChatLogsDB(pg int, tar, curr string) ([]*models.P2PChatL
 GetGroupChatLogsDB
 gets the chat of a specific group
 */
-func (db *DB) GetGroupChatLogsDB(pg int, groupid string) ([]*models.GroupChatLog, error) {
+func (db *DB) GetGroupChatLogsDB(pg int, groupid string) ([]*models.GroupChatTextLog, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 	defer cancel()
@@ -93,7 +93,7 @@ func (db *DB) GetGroupChatLogsDB(pg int, groupid string) ([]*models.GroupChatLog
 	opts.SetSkip(int64((pg - 1) * 60))
 	opts.SetLimit(60)
 
-	var res []*models.GroupChatLog
+	var res []*models.GroupChatTextLog
 
 	cursor, err := db.FormatGroupChatlogs().Find(ctx, filter, opts)
 	if err != nil {
@@ -103,7 +103,7 @@ func (db *DB) GetGroupChatLogsDB(pg int, groupid string) ([]*models.GroupChatLog
 
 	for cursor.Next(ctx) {
 
-		var chat models.GroupChatLog
+		var chat models.GroupChatTextLog
 
 		err := cursor.Decode(&chat)
 		if err != nil {
@@ -127,12 +127,12 @@ func (db *DB) GetGroupChatLogsDB(pg int, groupid string) ([]*models.GroupChatLog
 	Inserts a new message to the private conversation collection
 */
 
-func (db *DB) InsertP2PMessageDB(m models.P2PChatLog) (string, error) {
+func (db *DB) InsertP2PMessageDB(m models.P2PTextChatLog) (string, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	info, err := db.FormatUserCollection().InsertOne(ctx, m, nil)
+	info, err := db.FormatUserChatlogs().InsertOne(ctx, m, nil)
 	if err != nil {
 		return "", err
 	}
@@ -145,7 +145,7 @@ func (db *DB) InsertP2PMessageDB(m models.P2PChatLog) (string, error) {
 InsertGroupMessageDB
 Inserts a new message to the group collection
 */
-func (db *DB) InsertGroupMessageDB(m models.GroupChatLog) (string, error) {
+func (db *DB) InsertGroupMessageDB(m models.GroupChatTextLog) (string, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
