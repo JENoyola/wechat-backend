@@ -5,8 +5,8 @@ import (
 	"errors"
 	"io"
 	"net/http"
-
 	"github.com/gorilla/websocket"
+
 )
 
 // ReadStringToJSON takes a string and embeds it to a given structure
@@ -17,6 +17,21 @@ func ReadStringToJSON(payload string, dst interface{}) error {
 		return err
 	}
 
+	return nil
+}
+
+func ReadWebsocketJSON(conn *websocket.Conn, data any) error {
+
+	decoder := json.NewDecoder(conn.Request().Body)
+	err := decoder.Decode(&data)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&struct{}{})
+	if err != io.EOF {
+		return errors.New("body must only have a single json value")
+	}
 	return nil
 }
 
