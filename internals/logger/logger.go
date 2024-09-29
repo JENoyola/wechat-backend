@@ -34,12 +34,12 @@ func StartLogger() *Logger {
 }
 
 // InfoLogger logs message to the terminal
-func (l *Logger) InfoLogger(message string) {
+func (l *Logger) InfoLogger(message ...string) {
 	l.logger.Info(fmt.Sprintf("::: ----------> %v", message))
 }
 
 // WarningLogger logs a warning log to the teminal and saves it to a .log file
-func (l *Logger) WarningLogger(message string) {
+func (l *Logger) WarningLogger(message ...string) {
 	l.logger.Warn(message)
 }
 
@@ -49,7 +49,7 @@ func (l *Logger) ErrorLog(message ...string) {
 }
 
 // FatalLog logas an Fatal log in terminal, saves the log into a .log file and exits program with exit status 1
-func (l *Logger) FatalLog(message string) {
+func (l *Logger) FatalLog(message ...string) {
 	defer l.logger.Fatal(message)
 }
 
