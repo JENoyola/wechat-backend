@@ -9,6 +9,7 @@ import (
 	"wechat-back/internals/logger"
 	"wechat-back/internals/models"
 	"wechat-back/internals/tools"
+	"wechat-back/internals/workerpool"
 	"wechat-back/providers/media"
 
 	"github.com/gorilla/websocket"
@@ -25,6 +26,9 @@ type WebsocketPanel struct {
 
 	// GroupConnections holds all the group connections
 	GroupConnections map[string]GroupConnectionCredentials
+
+	// Workerpool
+	WorkerPool *workerpool.WorkerPool
 
 	// DBConn access for database
 	DBConn database.DBHUB
@@ -61,6 +65,7 @@ func StartWebsocketService() {
 		mux:              sync.Mutex{},
 		P2PConnections:   make(map[string]P2PConnectionCredentials),
 		GroupConnections: make(map[string]GroupConnectionCredentials),
+		WorkerPool:       workerpool.StartNewWorkerPool(10, 100),
 	}
 }
 
@@ -72,6 +77,10 @@ func StopWebsocketService() {
 		return
 	}
 
+	alog.WarningLogger("Gracefully shutting down worker pool")
+	WebsocketHUB.WorkerPool.ShutdownPool()
+
+	alog.WarningLogger("Initializing websocket clean up")
 	WebsocketHUB.mux.Lock()
 	defer WebsocketHUB.mux.Unlock()
 
@@ -103,8 +112,7 @@ func ListenForP2PActivity(c P2PConnectionCredentials) {
 
 		msgType, data, err := c.Conn.ReadMessage()
 		if err != nil {
-			c.Conn.Close()
-			delete(WebsocketHUB.P2PConnections, c.AuthorID)
+			c.CloseP2PConnection()
 			break
 		}
 
@@ -136,6 +144,15 @@ func ListenForP2PActivity(c P2PConnectionCredentials) {
 
 }
 
+func (p *P2PConnectionCredentials) CloseP2PConnection() {
+	WebsocketHUB.mux.Lock()
+	defer WebsocketHUB.mux.Unlock()
+	if err := p.Conn.Close(); err != nil {
+		logger.StartLogger().ErrorLog(fmt.Sprintf("Error closing WebSocket connection for AuthorID %s: %v", p.AuthorID, err))
+	}
+	delete(WebsocketHUB.P2PConnections, p.AuthorID)
+}
+
 func ListenForGroupActivity(c GroupConnectionCredentials) {
 
 	alog := logger.StartLogger()
@@ -145,8 +162,7 @@ func ListenForGroupActivity(c GroupConnectionCredentials) {
 
 		msgType, data, err := c.Conn.ReadMessage()
 		if err != nil {
-			c.Conn.Close()
-			delete(WebsocketHUB.GroupConnections, c.AuthorID)
+			c.CloseGroupConnection()
 			break
 		}
 
@@ -157,11 +173,10 @@ func ListenForGroupActivity(c GroupConnectionCredentials) {
 			err = json.Unmarshal(data, &payload)
 			if err != nil {
 				alog.ErrorLog(err.Error())
-				// tools.WriteWebsocketJSON(c.Conn, msg.FormatErrorOutboundTextMessage(BAD_FIELD, err))
+				tools.WriteWebsocketJSON(c.Conn, models.FormatWebsocketErrResponse(err, BAD_FIELD))
 				continue
 			}
 
-			// broadcase
 			c.HandleGroupTextContent(payload)
 
 		case websocket.BinaryMessage:
@@ -170,8 +185,7 @@ func ListenForGroupActivity(c GroupConnectionCredentials) {
 			cont, err := tools.ReadBinaryWebsocketMessage(data, &payload)
 			if err != nil {
 				alog.ErrorLog(err.Error())
-				msg := models.OutboundP2PTextMessage{}
-				tools.WriteWebsocketJSON(c.Conn, msg.FormatErrorOutboundMessage(BAD_FIELD, err))
+				tools.WriteWebsocketJSON(c.Conn, models.FormatWebsocketErrResponse(err, BAD_FIELD))
 				continue
 			}
 
@@ -182,6 +196,15 @@ func ListenForGroupActivity(c GroupConnectionCredentials) {
 		}
 
 	}
+}
+
+func (g *GroupConnectionCredentials) CloseGroupConnection() {
+	WebsocketHUB.mux.Lock()
+	defer WebsocketHUB.mux.Unlock()
+	if err := g.Conn.Close(); err != nil {
+		logger.StartLogger().ErrorLog(fmt.Sprintf("Error closing WebSocket connection for GroupID %s: %v", g.TargetID, err))
+	}
+	delete(WebsocketHUB.GroupConnections, g.AuthorID)
 }
 
 func (p *P2PConnectionCredentials) HandleP2PTextContent(msg models.InboundP2PTextMessage) {
@@ -197,11 +220,13 @@ func (p *P2PConnectionCredentials) HandleP2PTextContent(msg models.InboundP2PTex
 
 	payload.FormatTextLog(tarID, p.AuthorData.ID, p.AuthorData.Name, msg.Body)
 
-	_, err = WebsocketHUB.DBConn.InsertP2PMessageDB(payload)
-	if err != nil {
-		alog.ErrorLog(err.Error())
-		tools.WriteWebsocketJSON(p.Conn, models.FormatWebsocketErrResponse(err, DB_ERROR))
-	}
+	WebsocketHUB.WorkerPool.AssignJobToWorker(func() {
+		_, err = WebsocketHUB.DBConn.InsertP2PMessageDB(payload)
+		if err != nil {
+			alog.ErrorLog(err.Error())
+			tools.WriteWebsocketJSON(p.Conn, models.FormatWebsocketErrResponse(err, DB_ERROR))
+		}
+	})
 
 	p.BroadcastToP2P(payload)
 }
@@ -229,11 +254,13 @@ func (p *P2PConnectionCredentials) HandleP2PMediaContent(msg models.InboundP2PCo
 
 		payload.FormatContentChatLog(tarID, p.AuthorData.ID, p.AuthorData.Name, msg.Body, videoPlay.GUID, []string{videoPlay.Src}, []string{videoPlay.Thumbnail}, models.MESSAGE_TYPE_MEDIA_VIDEOS)
 
-		_, err = WebsocketHUB.DBConn.InsertP2PMessageDB(payload)
-		if err != nil {
-			alog.ErrorLog(err.Error())
-			tools.WriteWebsocketJSON(p.Conn, models.FormatWebsocketErrResponse(err, DB_ERROR))
-		}
+		WebsocketHUB.WorkerPool.AssignJobToWorker(func() {
+			_, err = WebsocketHUB.DBConn.InsertP2PMessageDB(payload)
+			if err != nil {
+				alog.ErrorLog(err.Error())
+				tools.WriteWebsocketJSON(p.Conn, models.FormatWebsocketErrResponse(err, DB_ERROR))
+			}
+		})
 
 	case models.MESSAGE_TYPE_MEDIA_IMAGES:
 		ImageInfo, err := WebsocketHUB.MediaProvider.InsetImages(binaryContent, msg.Filename)
@@ -244,11 +271,13 @@ func (p *P2PConnectionCredentials) HandleP2PMediaContent(msg models.InboundP2PCo
 
 		payload.FormatContentChatLog(tarID, p.AuthorData.ID, p.AuthorData.Name, msg.Body, ImageInfo.ContentID, ImageInfo.MediaSource, ImageInfo.Thumbnails, models.MESSAGE_TYPE_MEDIA_IMAGES)
 
-		_, err = WebsocketHUB.DBConn.InsertP2PMessageDB(payload)
-		if err != nil {
-			alog.ErrorLog(err.Error())
-			tools.WriteWebsocketJSON(p.Conn, models.FormatWebsocketErrResponse(err, DB_ERROR))
-		}
+		WebsocketHUB.WorkerPool.AssignJobToWorker(func() {
+			_, err = WebsocketHUB.DBConn.InsertP2PMessageDB(payload)
+			if err != nil {
+				alog.ErrorLog(err.Error())
+				tools.WriteWebsocketJSON(p.Conn, models.FormatWebsocketErrResponse(err, DB_ERROR))
+			}
+		})
 
 	case models.MESSAGE_TYPE_FILE:
 
@@ -259,11 +288,14 @@ func (p *P2PConnectionCredentials) HandleP2PMediaContent(msg models.InboundP2PCo
 		}
 		payload.FormatContentChatLog(tarID, p.AuthorData.ID, p.AuthorData.Name, msg.Body, "N/A", []string{fileURL}, []string{""}, models.MESSAGE_TYPE_FILE)
 
-		_, err = WebsocketHUB.DBConn.InsertP2PMessageDB(payload)
-		if err != nil {
-			alog.ErrorLog(err.Error())
-			tools.WriteWebsocketJSON(p.Conn, models.FormatWebsocketErrResponse(err, DB_ERROR))
-		}
+		WebsocketHUB.WorkerPool.AssignJobToWorker(func() {
+			_, err = WebsocketHUB.DBConn.InsertP2PMessageDB(payload)
+			if err != nil {
+				alog.ErrorLog(err.Error())
+				tools.WriteWebsocketJSON(p.Conn, models.FormatWebsocketErrResponse(err, DB_ERROR))
+			}
+		})
+
 	}
 
 	p.BroadcastToP2P(payload)
@@ -278,13 +310,13 @@ func (g *GroupConnectionCredentials) HandleGroupTextContent(msg models.InboundGr
 
 	payload.FormatTextChatLog(g.TargetData.ID, g.AuthorData.ID, g.AuthorData.Name, msg.Body)
 
-	go func() {
+	WebsocketHUB.WorkerPool.AssignJobToWorker(func() {
 		_, err := WebsocketHUB.DBConn.InsertGroupMessageDB(payload)
 		if err != nil {
 			alog.ErrorLog(err.Error())
-			// tools.WriteWebsocketJSON(g.Conn, res.FormatErrorOutboundTextMessage(BAD_FIELD, err))
+			tools.WriteWebsocketJSON(g.Conn, models.FormatWebsocketErrResponse(err, DB_ERROR))
 		}
-	}()
+	})
 
 	g.BroadcastToParticipants(g.TargetData.Participants, msg.PushTokens, payload)
 
@@ -308,11 +340,13 @@ func (g *GroupConnectionCredentials) HandleGroupMediaContent(msg models.InboundG
 
 		payload.FormatContentChatLog(g.TargetData.ID, g.AuthorData.ID, g.AuthorData.Name, msg.Body, videoPlay.GUID, []string{videoPlay.Src}, []string{videoPlay.Thumbnail}, models.MESSAGE_TYPE_MEDIA_VIDEOS)
 
-		_, err = WebsocketHUB.DBConn.InsertGroupMessageDB(payload)
-		if err != nil {
-			alog.ErrorLog(err.Error())
-			tools.WriteWebsocketJSON(g.Conn, models.FormatWebsocketErrResponse(err, DB_ERROR))
-		}
+		WebsocketHUB.WorkerPool.AssignJobToWorker(func() {
+			_, err = WebsocketHUB.DBConn.InsertGroupMessageDB(payload)
+			if err != nil {
+				alog.ErrorLog(err.Error())
+				tools.WriteWebsocketJSON(g.Conn, models.FormatWebsocketErrResponse(err, DB_ERROR))
+			}
+		})
 
 	case models.MESSAGE_TYPE_MEDIA_IMAGES:
 		ImageInfo, err := WebsocketHUB.MediaProvider.InsetImages(binaryContent, msg.Filename)
@@ -323,12 +357,14 @@ func (g *GroupConnectionCredentials) HandleGroupMediaContent(msg models.InboundG
 
 		payload.FormatContentChatLog(g.TargetData.ID, g.AuthorData.ID, g.AuthorData.Name, msg.Body, ImageInfo.ContentID, ImageInfo.MediaSource, ImageInfo.Thumbnails, models.MESSAGE_TYPE_MEDIA_IMAGES)
 
-		_, err = WebsocketHUB.DBConn.InsertGroupMessageDB(payload)
-		if err != nil {
-			alog.ErrorLog(err.Error())
-			tools.WriteWebsocketJSON(g.Conn, models.FormatWebsocketErrResponse(err, DB_ERROR))
+		WebsocketHUB.WorkerPool.AssignJobToWorker(func() {
+			_, err = WebsocketHUB.DBConn.InsertGroupMessageDB(payload)
+			if err != nil {
+				alog.ErrorLog(err.Error())
+				tools.WriteWebsocketJSON(g.Conn, models.FormatWebsocketErrResponse(err, DB_ERROR))
 
-		}
+			}
+		})
 
 	case models.MESSAGE_TYPE_FILE:
 
@@ -341,12 +377,14 @@ func (g *GroupConnectionCredentials) HandleGroupMediaContent(msg models.InboundG
 
 		payload.FormatContentChatLog(g.TargetData.ID, g.AuthorData.ID, g.AuthorData.Name, msg.Body, "N/A", []string{fileURL}, []string{}, models.MESSAGE_TYPE_FILE)
 
-		_, err = WebsocketHUB.DBConn.InsertGroupMessageDB(payload)
-		if err != nil {
-			alog.ErrorLog(err.Error())
-			tools.WriteWebsocketJSON(g.Conn, models.FormatWebsocketErrResponse(err, DB_ERROR))
+		WebsocketHUB.WorkerPool.AssignJobToWorker(func() {
+			_, err = WebsocketHUB.DBConn.InsertGroupMessageDB(payload)
+			if err != nil {
+				alog.ErrorLog(err.Error())
+				tools.WriteWebsocketJSON(g.Conn, models.FormatWebsocketErrResponse(err, DB_ERROR))
 
-		}
+			}
+		})
 
 	}
 
