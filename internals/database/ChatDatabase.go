@@ -127,7 +127,7 @@ func (db *DB) GetGroupChatLogsDB(pg int, groupid string) ([]*models.GroupChatTex
 	Inserts a new message to the private conversation collection
 */
 
-func (db *DB) InsertP2PMessageDB(m models.P2PTextChatLog) (string, error) {
+func (db *DB) InsertP2PMessageDB(m any) (string, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
@@ -145,7 +145,7 @@ func (db *DB) InsertP2PMessageDB(m models.P2PTextChatLog) (string, error) {
 InsertGroupMessageDB
 Inserts a new message to the group collection
 */
-func (db *DB) InsertGroupMessageDB(m models.GroupChatTextLog) (string, error) {
+func (db *DB) InsertGroupMessageDB(m any) (string, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()

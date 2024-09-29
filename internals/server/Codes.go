@@ -127,3 +127,12 @@ FOREIGN_ACCESS
 means that another device is trying to access the device
 */
 const FOREIGN_ACCESS = 525
+
+// WEBSOCKET CODES
+
+/*
+	PROVIDER_ERROR
+	means that the provider used on websocket throw an error
+*/
+
+const PROVIDER_ERROR = 658

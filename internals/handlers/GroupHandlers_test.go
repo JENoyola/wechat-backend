@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -12,6 +14,7 @@ import (
 	"wechat-back/internals/decorators"
 	"wechat-back/internals/models"
 	"wechat-back/internals/server"
+	"wechat-back/providers/media"
 
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -25,6 +28,7 @@ func TestCreateNewGroupEP(t *testing.T) {
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 
 	mt.Run("CreateNewGroupEP - Success insertion", func(mt *mtest.T) {
+		imageData := "iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEOSURBVChTTZFRYsYgCIMR293/YefYAXa1KuwLavfTxlohQLD9/nynpWF8Mta21ftvdWgWyYbXu/E0wc0LzVghQVPwJpRxpLTusLvYPJWe/amizAdjTssRNsc0z94sOhFE9lzEVBs6oqrwFoOQT9AecQJ9WXO3i3ZPqWoVdJHxWUfGV4cEg6WIDtGvrXFrlTZVk+Z+c4bfUxkUXFlprfYECNIpk2ZVqxhhpglv468AbfePku19ER/uZkTUhCRFspdb6xJX/1unzG1yGBqr2YMj5NREL3+nWvErkwUFvCk6FpGi5UuiDhpD+jT5feQwIclQGTnWt7DFf1oNIlrlBlKj1Osy8xAUdN9cxbWTNPsDd7F5rPBhKbMAAAAASUVORK5CYII="
 
 		data := models.Group{
 			Name:         "Pirates fans",
@@ -44,10 +48,22 @@ func TestCreateNewGroupEP(t *testing.T) {
 			},
 		}
 
+		m := &media.MediaMock{}
+
 		var body bytes.Buffer
 
 		// add fields
 		writter := multipart.NewWriter(&body)
+
+		part, err := writter.CreateFormFile("avatar", "test.jpg")
+		assert.Nil(t, err)
+
+		d, err := base64.StdEncoding.DecodeString(imageData)
+		assert.Nil(t, err)
+
+		_, err = io.Copy(part, bytes.NewReader(d))
+		assert.Nil(t, err)
+
 		err = writter.WriteField("data", string(r))
 		assert.Nil(t, err)
 
@@ -61,7 +77,7 @@ func TestCreateNewGroupEP(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 
-		handler := decorators.HandlerDecorator(CreateNewGroupEP, db)
+		handler := decorators.HandlerWProvidersDecorator(CreateNewGroupEP, db, m)
 		handler.ServeHTTP(rr, req)
 
 		var res models.ServerResponse
@@ -86,6 +102,8 @@ func TestCreateNewGroupEP(t *testing.T) {
 			},
 		}
 
+		media := &media.MediaMock{}
+
 		var body bytes.Buffer
 
 		// add fields
@@ -103,7 +121,7 @@ func TestCreateNewGroupEP(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 
-		handler := decorators.HandlerDecorator(CreateNewGroupEP, db)
+		handler := decorators.HandlerWProvidersDecorator(CreateNewGroupEP, db, media)
 		handler.ServeHTTP(rr, req)
 
 		var res models.ServerResponse
@@ -117,7 +135,8 @@ func TestCreateNewGroupEP(t *testing.T) {
 		assert.Nil(t, res.DATA)
 
 	})
-	mt.Run("CreateNewGroupEP - ", func(mt *mtest.T) {
+	mt.Run("CreateNewGroupEP - Error inserting", func(mt *mtest.T) {
+		imageData := "iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEOSURBVChTTZFRYsYgCIMR293/YefYAXa1KuwLavfTxlohQLD9/nynpWF8Mta21ftvdWgWyYbXu/E0wc0LzVghQVPwJpRxpLTusLvYPJWe/amizAdjTssRNsc0z94sOhFE9lzEVBs6oqrwFoOQT9AecQJ9WXO3i3ZPqWoVdJHxWUfGV4cEg6WIDtGvrXFrlTZVk+Z+c4bfUxkUXFlprfYECNIpk2ZVqxhhpglv468AbfePku19ER/uZkTUhCRFspdb6xJX/1unzG1yGBqr2YMj5NREL3+nWvErkwUFvCk6FpGi5UuiDhpD+jT5feQwIclQGTnWt7DFf1oNIlrlBlKj1Osy8xAUdN9cxbWTNPsDd7F5rPBhKbMAAAAASUVORK5CYII="
 
 		expectedError := errors.New("error trying to insert document")
 
@@ -139,10 +158,22 @@ func TestCreateNewGroupEP(t *testing.T) {
 			},
 		}
 
+		media := &media.MediaMock{}
+
 		var body bytes.Buffer
 
 		// add fields
 		writter := multipart.NewWriter(&body)
+
+		part, err := writter.CreateFormFile("avatar", "test.jpg")
+		assert.Nil(t, err)
+
+		d, err := base64.StdEncoding.DecodeString(imageData)
+		assert.Nil(t, err)
+
+		_, err = io.Copy(part, bytes.NewReader(d))
+		assert.Nil(t, err)
+
 		err = writter.WriteField("data", string(r))
 		assert.Nil(t, err)
 
@@ -156,7 +187,7 @@ func TestCreateNewGroupEP(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 
-		handler := decorators.HandlerDecorator(CreateNewGroupEP, db)
+		handler := decorators.HandlerWProvidersDecorator(CreateNewGroupEP, db, media)
 		handler.ServeHTTP(rr, req)
 
 		var res models.ServerResponse

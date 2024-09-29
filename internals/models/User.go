@@ -16,6 +16,7 @@ const (
 // User structure that onlines the user
 type User struct {
 	ID            primitive.ObjectID `json:"_id" bson:"_id"`
+	ProfileAvatar string             `json:"profile_avatar"`
 	Name          string             `json:"name" bson:"name"`
 	Email         string             `json:"email" bson:"email"`
 	ValidCode     int                `json:"valid_code" bson:"valid_code"`

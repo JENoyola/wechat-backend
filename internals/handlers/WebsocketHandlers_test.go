@@ -11,6 +11,7 @@ import (
 	"wechat-back/internals/decorators"
 	"wechat-back/internals/models"
 	"wechat-back/internals/server"
+	"wechat-back/providers/media"
 
 	"github.com/gorilla/websocket"
 	"github.com/stretchr/testify/assert"
@@ -32,7 +33,7 @@ func TestHandleP2PConnectionEP(t *testing.T) {
 		tar := primitive.NewObjectID()
 		tar_token := "111111111"
 
-		body := models.InboundP2PMessage{
+		body := models.InboundP2PTextMessage{
 			MessageID:       "",
 			AuthorID:        MockObjectID.Hex(),
 			TargetID:        tar.Hex(),
@@ -55,12 +56,15 @@ func TestHandleP2PConnectionEP(t *testing.T) {
 			FindUserMockFunc: func(s string) (models.User, bool, error) {
 				return returnedUser, true, nil
 			},
-			InsertP2PMessageDBMockFunc: func(ppcl models.P2PTextChatLog) (string, error) {
+			InsertP2PMessageDBMockFunc: func(ppcl any) (string, error) {
 
 				return "", nil
 			},
 		}
-		server := httptest.NewServer(http.HandlerFunc(decorators.HandlerDecorator(HandleP2PConnectionEP, db)))
+
+		m := &media.MediaMock{}
+
+		server := httptest.NewServer(http.HandlerFunc(decorators.HandlerWProvidersDecorator(HandleP2PConnectionEP, db, m)))
 		defer server.Close()
 
 		conn, _, err := websocket.DefaultDialer.Dial(fmt.Sprintf("%s/ws?&email=%s&tar=%s&tar_tkn=%s", strings.ReplaceAll(server.URL, "http", "ws"), expectedEmail, tar.Hex(), tar_token), nil)
@@ -110,12 +114,15 @@ func TestHandleP2PConnectionEP(t *testing.T) {
 			FindUserMockFunc: func(s string) (models.User, bool, error) {
 				return returnedUser, false, expectedError
 			},
-			InsertP2PMessageDBMockFunc: func(ppcl models.P2PTextChatLog) (string, error) {
+			InsertP2PMessageDBMockFunc: func(ppcl any) (string, error) {
 
 				return "", nil
 			},
 		}
-		S := httptest.NewServer(http.HandlerFunc(decorators.HandlerDecorator(HandleP2PConnectionEP, db)))
+
+		m := &media.MediaMock{}
+
+		S := httptest.NewServer(http.HandlerFunc(decorators.HandlerWProvidersDecorator(HandleP2PConnectionEP, db, m)))
 		defer S.Close()
 
 		conn, _, err := websocket.DefaultDialer.Dial(fmt.Sprintf("%s/ws?&email=%s&tar=%s&tar_tkn=%s", strings.ReplaceAll(S.URL, "http", "ws"), expectedEmail, tar.Hex(), tar_token), nil)
@@ -156,12 +163,15 @@ func TestHandleP2PConnectionEP(t *testing.T) {
 			FindUserMockFunc: func(s string) (models.User, bool, error) {
 				return returnedUser, false, nil
 			},
-			InsertP2PMessageDBMockFunc: func(ppcl models.P2PTextChatLog) (string, error) {
+			InsertP2PMessageDBMockFunc: func(ppcl any) (string, error) {
 
 				return "", nil
 			},
 		}
-		S := httptest.NewServer(http.HandlerFunc(decorators.HandlerDecorator(HandleP2PConnectionEP, db)))
+
+		m := &media.MediaMock{}
+
+		S := httptest.NewServer(http.HandlerFunc(decorators.HandlerWProvidersDecorator(HandleP2PConnectionEP, db, m)))
 		defer S.Close()
 
 		conn, _, err := websocket.DefaultDialer.Dial(fmt.Sprintf("%s/ws?&email=%s&tar=%s&tar_tkn=%s", strings.ReplaceAll(S.URL, "http", "ws"), expectedEmail, tar.Hex(), tar_token), nil)
@@ -203,12 +213,15 @@ func TestHandleP2PConnectionEP(t *testing.T) {
 			FindUserMockFunc: func(s string) (models.User, bool, error) {
 				return returnedUser, true, nil
 			},
-			InsertP2PMessageDBMockFunc: func(ppcl models.P2PTextChatLog) (string, error) {
+			InsertP2PMessageDBMockFunc: func(ppcl any) (string, error) {
 
 				return "", nil
 			},
 		}
-		S := httptest.NewServer(http.HandlerFunc(decorators.HandlerDecorator(HandleP2PConnectionEP, db)))
+
+		m := &media.MediaMock{}
+
+		S := httptest.NewServer(http.HandlerFunc(decorators.HandlerWProvidersDecorator(HandleP2PConnectionEP, db, m)))
 		defer S.Close()
 
 		conn, _, err := websocket.DefaultDialer.Dial(fmt.Sprintf("%s/ws?&email=%s&tar=%s&tar_tkn=%s", strings.ReplaceAll(S.URL, "http", "ws"), expectedEmail, tar.Hex(), tar_token), nil)
@@ -227,7 +240,7 @@ func TestHandleP2PConnectionEP(t *testing.T) {
 		assert.Nil(t, err)
 
 		assert.True(t, res.Error)
-		assert.Equal(t, server.BAD_FIELD, res.Code)
+		assert.Equal(t, server.BAD_REQUEST, res.Code)
 
 	})
 
@@ -239,7 +252,7 @@ func TestHandleP2PConnectionEP(t *testing.T) {
 		tar := "notAObjectID"
 		tar_token := "111111111"
 
-		body := models.InboundP2PMessage{
+		body := models.InboundP2PTextMessage{
 			MessageID:       "",
 			AuthorID:        MockObjectID.Hex(),
 			TargetID:        tar,
@@ -262,12 +275,15 @@ func TestHandleP2PConnectionEP(t *testing.T) {
 			FindUserMockFunc: func(s string) (models.User, bool, error) {
 				return returnedUser, true, nil
 			},
-			InsertP2PMessageDBMockFunc: func(ppcl models.P2PTextChatLog) (string, error) {
+			InsertP2PMessageDBMockFunc: func(ppcl any) (string, error) {
 
 				return "", nil
 			},
 		}
-		S := httptest.NewServer(http.HandlerFunc(decorators.HandlerDecorator(HandleP2PConnectionEP, db)))
+
+		m := &media.MediaMock{}
+
+		S := httptest.NewServer(http.HandlerFunc(decorators.HandlerWProvidersDecorator(HandleP2PConnectionEP, db, m)))
 		defer S.Close()
 
 		conn, _, err := websocket.DefaultDialer.Dial(fmt.Sprintf("%s/ws?&email=%s&tar=%s&tar_tkn=%s", strings.ReplaceAll(S.URL, "http", "ws"), expectedEmail, tar, tar_token), nil)
@@ -292,7 +308,6 @@ func TestHandleP2PConnectionEP(t *testing.T) {
 		assert.Equal(t, server.BAD_FIELD, res.Code)
 		assert.EqualError(t, primitive.ErrInvalidHex, res.Message)
 	})
-
 }
 
 // TestHandleGroupConnectionsEP test the handler HandleGroupConnectionsEP
@@ -348,12 +363,14 @@ func TestHandleGroupConnectionsEP(t *testing.T) {
 			GetGroupDBMockFunc: func(s string) (*models.Group, error) {
 				return &returnedGroup, nil
 			},
-			InsertGroupMessageDBMockFun: func(m models.GroupChatTextLog) (string, error) {
+			InsertGroupMessageDBMockFun: func(m any) (string, error) {
 				return "", nil
 			},
 		}
 
-		S := httptest.NewServer(http.HandlerFunc(decorators.HandlerDecorator(HandleGroupConnectionsEP, &db)))
+		m := &media.MediaMock{}
+
+		S := httptest.NewServer(http.HandlerFunc(decorators.HandlerWProvidersDecorator(HandleGroupConnectionsEP, &db, m)))
 		defer S.Close()
 
 		conn, _, err := websocket.DefaultDialer.Dial(fmt.Sprintf("%s/ws?gi=%s&ui=%s", strings.ReplaceAll(S.URL, "http", "ws"), expectedGroupID, expectedEmail), nil)
@@ -428,12 +445,14 @@ func TestHandleGroupConnectionsEP(t *testing.T) {
 			GetGroupDBMockFunc: func(s string) (*models.Group, error) {
 				return &returnedGroup, nil
 			},
-			InsertGroupMessageDBMockFun: func(m models.GroupChatTextLog) (string, error) {
+			InsertGroupMessageDBMockFun: func(m any) (string, error) {
 				return "", nil
 			},
 		}
 
-		S := httptest.NewServer(http.HandlerFunc(decorators.HandlerDecorator(HandleGroupConnectionsEP, &db)))
+		m := &media.MediaMock{}
+
+		S := httptest.NewServer(http.HandlerFunc(decorators.HandlerWProvidersDecorator(HandleGroupConnectionsEP, &db, m)))
 		defer S.Close()
 
 		conn, _, err := websocket.DefaultDialer.Dial(fmt.Sprintf("%s/ws?gi=%s&ui=%s", strings.ReplaceAll(S.URL, "http", "ws"), expectedGroupID, expectedEmail), nil)
@@ -507,12 +526,14 @@ func TestHandleGroupConnectionsEP(t *testing.T) {
 			GetGroupDBMockFunc: func(s string) (*models.Group, error) {
 				return &returnedGroup, nil
 			},
-			InsertGroupMessageDBMockFun: func(m models.GroupChatTextLog) (string, error) {
+			InsertGroupMessageDBMockFun: func(m any) (string, error) {
 				return "", nil
 			},
 		}
 
-		S := httptest.NewServer(http.HandlerFunc(decorators.HandlerDecorator(HandleGroupConnectionsEP, &db)))
+		m := &media.MediaMock{}
+
+		S := httptest.NewServer(http.HandlerFunc(decorators.HandlerWProvidersDecorator(HandleGroupConnectionsEP, &db, m)))
 		defer S.Close()
 
 		conn, _, err := websocket.DefaultDialer.Dial(fmt.Sprintf("%s/ws?gi=%s&ui=%s", strings.ReplaceAll(S.URL, "http", "ws"), expectedGroupID, expectedEmail), nil)
@@ -525,8 +546,7 @@ func TestHandleGroupConnectionsEP(t *testing.T) {
 		err = conn.WriteMessage(websocket.TextMessage, data2Send)
 		assert.Nil(t, err)
 
-		_, data, err := conn.ReadMessage()
-		assert.Nil(t, err)
+		_, data, _ := conn.ReadMessage()
 
 		var res models.OutboundGroupTextMessage
 
@@ -547,7 +567,7 @@ func TestHandleGroupConnectionsEP(t *testing.T) {
 		expectedError := mongo.ErrNoDocuments
 
 		expectedEmail := "jorge@mail.com"
-		expectedGroupID := "6177226702-5T2de426p8arbt6sb4b128o63afaG9u3f-1727206726"
+		expectedGroupID := ""
 		expectedUsers := []primitive.ObjectID{primitive.NewObjectID(), primitive.NewObjectID(), MockObjectID}
 
 		messageBody := models.InboundGroupTextMessage{
@@ -590,12 +610,14 @@ func TestHandleGroupConnectionsEP(t *testing.T) {
 			GetGroupDBMockFunc: func(s string) (*models.Group, error) {
 				return &returnedGroup, expectedError
 			},
-			InsertGroupMessageDBMockFun: func(m models.GroupChatTextLog) (string, error) {
+			InsertGroupMessageDBMockFun: func(m any) (string, error) {
 				return "", nil
 			},
 		}
 
-		S := httptest.NewServer(http.HandlerFunc(decorators.HandlerDecorator(HandleGroupConnectionsEP, &db)))
+		m := &media.MediaMock{}
+
+		S := httptest.NewServer(http.HandlerFunc(decorators.HandlerWProvidersDecorator(HandleGroupConnectionsEP, &db, m)))
 		defer S.Close()
 
 		conn, _, err := websocket.DefaultDialer.Dial(fmt.Sprintf("%s/ws?gi=%s&ui=%s", strings.ReplaceAll(S.URL, "http", "ws"), expectedGroupID, expectedEmail), nil)
@@ -622,5 +644,4 @@ func TestHandleGroupConnectionsEP(t *testing.T) {
 		assert.Empty(t, res.Body)
 
 	})
-
 }

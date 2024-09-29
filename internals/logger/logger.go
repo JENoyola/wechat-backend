@@ -44,7 +44,7 @@ func (l *Logger) WarningLogger(message string) {
 }
 
 // ErrorLog logs an error to the terminal log and saves it to a .log file
-func (l *Logger) ErrorLog(message string) {
+func (l *Logger) ErrorLog(message ...string) {
 	l.logger.Error(message)
 }
 
