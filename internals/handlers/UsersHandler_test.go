@@ -12,6 +12,7 @@ import (
 	"wechat-back/internals/decorators"
 	"wechat-back/internals/models"
 	"wechat-back/internals/server"
+	"wechat-back/providers/media"
 
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/mongo/integration/mtest"
@@ -41,6 +42,13 @@ func TestNewUserAccountEP(t *testing.T) {
 				return "", nil
 			},
 		}
+
+		media := &media.MediaMock{
+			InsertUserAvatarMockFunc: func(b []byte, s string) (string, error) {
+				return "", nil
+			},
+		}
+
 		bod, err := json.Marshal(user)
 		assert.Nil(t, err)
 
@@ -49,7 +57,7 @@ func TestNewUserAccountEP(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 
-		handler := decorators.HandlerDecorator(NewUserAccountEP, db)
+		handler := decorators.HandlerWProvidersDecorator(NewUserAccountEP, db, media)
 		handler.ServeHTTP(rr, req)
 
 		var res models.ServerResponse
@@ -81,6 +89,9 @@ func TestNewUserAccountEP(t *testing.T) {
 				return "", nil
 			},
 		}
+
+		media := &media.MediaMock{}
+
 		bod, err := json.Marshal(user)
 		assert.Nil(t, err)
 
@@ -89,7 +100,7 @@ func TestNewUserAccountEP(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 
-		handler := decorators.HandlerDecorator(NewUserAccountEP, db)
+		handler := decorators.HandlerWProvidersDecorator(NewUserAccountEP, db, media)
 		handler.ServeHTTP(rr, req)
 
 		var res models.ServerResponse
@@ -119,6 +130,9 @@ func TestNewUserAccountEP(t *testing.T) {
 				return "", nil
 			},
 		}
+
+		media := &media.MediaMock{}
+
 		bod, err := json.Marshal(user)
 		assert.Nil(t, err)
 
@@ -127,7 +141,7 @@ func TestNewUserAccountEP(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 
-		handler := decorators.HandlerDecorator(NewUserAccountEP, db)
+		handler := decorators.HandlerWProvidersDecorator(NewUserAccountEP, db, media)
 		handler.ServeHTTP(rr, req)
 
 		var res models.ServerResponse
@@ -158,6 +172,9 @@ func TestNewUserAccountEP(t *testing.T) {
 				return "", errors.New("could not insert document")
 			},
 		}
+
+		media := &media.MediaMock{}
+
 		bod, err := json.Marshal(user)
 		assert.Nil(t, err)
 
@@ -166,7 +183,7 @@ func TestNewUserAccountEP(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 
-		handler := decorators.HandlerDecorator(NewUserAccountEP, db)
+		handler := decorators.HandlerWProvidersDecorator(NewUserAccountEP, db, media)
 		handler.ServeHTTP(rr, req)
 
 		var res models.ServerResponse

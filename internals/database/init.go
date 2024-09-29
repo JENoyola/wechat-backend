@@ -27,8 +27,8 @@ type DBHUB interface {
 	SearchGroups(int, string) ([]*models.Group, error)
 
 	// chats
-	InsertP2PMessageDB(models.P2PTextChatLog) (string, error)
-	InsertGroupMessageDB(models.GroupChatTextLog) (string, error)
+	InsertP2PMessageDB(any) (string, error)
+	InsertGroupMessageDB(any) (string, error)
 }
 
 // ERRORS

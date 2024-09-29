@@ -1,11 +1,14 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"wechat-back/internals/database"
 	"wechat-back/internals/logger"
+	"wechat-back/internals/models"
 	"wechat-back/internals/server"
 	"wechat-back/internals/tools"
+	"wechat-back/providers/media"
 
 	"github.com/gorilla/websocket"
 )
@@ -14,7 +17,7 @@ import (
 HandleP2PConnectionEP
 Handles the p2p connection and adds the connection to the pool of users p2p
 */
-func HandleP2PConnectionEP(w http.ResponseWriter, r *http.Request, db database.DBHUB) {
+func HandleP2PConnectionEP(w http.ResponseWriter, r *http.Request, db database.DBHUB, provider media.MediaHUB) {
 
 	alog := logger.StartLogger()
 
@@ -32,12 +35,13 @@ func HandleP2PConnectionEP(w http.ResponseWriter, r *http.Request, db database.D
 	u, exist, err := db.FindUserDB(r.URL.Query().Get("email"))
 	if err != nil {
 		alog.ErrorLog(err.Error())
-		tools.WriteWebsocketJSON(conn, tools.FormatErrResponse(server.BAD_REQUEST, err))
+		tools.WriteWebsocketJSON(conn, models.FormatWebsocketErrResponse(err, server.BAD_REQUEST))
 		conn.Close()
 		return
 	} else if !exist {
 		alog.ErrorLog("forbidden")
-		tools.WriteWebsocketJSON(conn, tools.FormatCustomErrResponse("forbidden", server.NOT_ALLOWED))
+		tools.WriteWebsocketJSON(conn, models.FormatWebsocketErrResponse(fmt.Errorf("forbidden"), server.NOT_ALLOWED))
+		conn.Close()
 		return
 	}
 
@@ -51,6 +55,7 @@ func HandleP2PConnectionEP(w http.ResponseWriter, r *http.Request, db database.D
 
 	server.WebsocketHUB.P2PConnections[payload.AuthorID] = payload
 	server.WebsocketHUB.DBConn = db
+	server.WebsocketHUB.MediaProvider = provider
 
 	go server.ListenForP2PActivity(payload)
 
@@ -62,7 +67,7 @@ func HandleP2PConnectionEP(w http.ResponseWriter, r *http.Request, db database.D
 HandleGroupConnectionsEP
 Handles the group connection and adds the connection to the group pool
 */
-func HandleGroupConnectionsEP(w http.ResponseWriter, r *http.Request, db database.DBHUB) {
+func HandleGroupConnectionsEP(w http.ResponseWriter, r *http.Request, db database.DBHUB, provider media.MediaHUB) {
 
 	alog := logger.StartLogger()
 
@@ -100,6 +105,8 @@ func HandleGroupConnectionsEP(w http.ResponseWriter, r *http.Request, db databas
 		TargetData: group,
 	}
 	server.WebsocketHUB.GroupConnections[author.ID.Hex()] = payload
+
+	server.WebsocketHUB.MediaProvider = provider
 	server.WebsocketHUB.DBConn = db
 
 	go server.ListenForGroupActivity(payload)

@@ -9,7 +9,7 @@ import (
 
 func ChatRoutes(mux *chi.Mux) {
 
-	mux.Handle("/uchat", decorators.HandlerDecorator(handlers.HandleP2PConnectionEP, nil))
-	mux.Handle("/gchat", decorators.HandlerDecorator(handlers.HandleGroupConnectionsEP, nil))
+	mux.Handle("/uchat", decorators.HandlerWProvidersDecorator(handlers.HandleP2PConnectionEP, nil, nil))
+	mux.Handle("/gchat", decorators.HandlerWProvidersDecorator(handlers.HandleGroupConnectionsEP, nil, nil))
 
 }

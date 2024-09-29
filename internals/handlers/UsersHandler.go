@@ -1,8 +1,11 @@
 package handlers
 
 import (
+	"encoding/base64"
+	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 	"wechat-back/internals/database"
 	"wechat-back/internals/generators"
@@ -10,13 +13,14 @@ import (
 	"wechat-back/internals/models"
 	"wechat-back/internals/server"
 	"wechat-back/internals/tools"
+	"wechat-back/providers/media"
 )
 
 /*
 NewUserAccountEP
 creates a new user account and inserts it on the database
 */
-func NewUserAccountEP(w http.ResponseWriter, r *http.Request, db database.DBHUB) {
+func NewUserAccountEP(w http.ResponseWriter, r *http.Request, db database.DBHUB, provider media.MediaHUB) {
 
 	log := logger.StartLogger()
 
@@ -43,6 +47,22 @@ func NewUserAccountEP(w http.ResponseWriter, r *http.Request, db database.DBHUB)
 		tools.WriteJSON(w, http.StatusBadRequest, tools.FormatCustomErrResponse("not allowed", server.NOT_ALLOWED))
 		return
 	}
+
+	data, err := base64.StdEncoding.DecodeString(user.ProfileAvatar)
+	if err != nil {
+		log.ErrorLog(err.Error())
+		tools.WriteJSON(w, http.StatusConflict, tools.FormatErrResponse(server.SERVER_ERROR, err))
+		return
+	}
+
+	profileURL, err := provider.InsertUserAvatar(data, fmt.Sprintf("%s.jpg", strings.ReplaceAll(user.Name, " ", "-")))
+	if err != nil {
+		log.ErrorLog(err.Error())
+		tools.WriteJSON(w, http.StatusConflict, tools.FormatErrResponse(server.SERVICES_ERROR, err))
+		return
+	}
+
+	user.ProfileAvatar = profileURL
 
 	// proceed to format user model
 	user = *models.FormatUserModel(&user)

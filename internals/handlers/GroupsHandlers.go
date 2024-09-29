@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -11,6 +12,7 @@ import (
 	"wechat-back/internals/models"
 	"wechat-back/internals/server"
 	"wechat-back/internals/tools"
+	"wechat-back/providers/media"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -20,7 +22,7 @@ import (
 CreateNewGroupEP
 Creates a new group and inserts it to the database
 */
-func CreateNewGroupEP(w http.ResponseWriter, r *http.Request, db database.DBHUB) {
+func CreateNewGroupEP(w http.ResponseWriter, r *http.Request, db database.DBHUB, provider media.MediaHUB) {
 
 	alog := logger.StartLogger()
 	w.Header().Set("Content-Type", "multipart/form-data")
@@ -35,10 +37,30 @@ func CreateNewGroupEP(w http.ResponseWriter, r *http.Request, db database.DBHUB)
 		return
 	}
 
-	// send image to services be uploaded
+	file, _, err := r.FormFile("avatar")
+	if err != nil {
+		alog.ErrorLog(err.Error())
+		tools.WriteJSON(w, http.StatusBadRequest, tools.FormatErrResponse(server.BAD_FIELD, err))
+		return
+	}
+
+	content, err := io.ReadAll(file)
+	if err != nil {
+		alog.ErrorLog(err.Error())
+		tools.WriteJSON(w, http.StatusInternalServerError, tools.FormatErrResponse(server.SERVICES_ERROR, err))
+		return
+	}
 
 	group = *models.FormatGroup(&group)
 
+	groupAvatarID, err := provider.InsertGroupAvatar(content, fmt.Sprintf("%s.jpg", group.GroupID))
+	if err != nil {
+		alog.ErrorLog(err.Error())
+		tools.WriteJSON(w, http.StatusInternalServerError, tools.FormatErrResponse(server.SERVICES_ERROR, err))
+		return
+	}
+
+	group.ProfileImage = groupAvatarID
 	_, err = db.InsertGroupDB(group)
 	if err != nil {
 		alog.ErrorLog(err.Error())
